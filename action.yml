@@ -1,5 +1,5 @@
 name: Container Cache
-description: "Injects the cached data into the docker build(x|kit) process"
+description: "Create a temporary container for the restore package"
 inputs:
   cache-image:
     description: "The image name of the cache. Like: `dotnet:6-focal`"
