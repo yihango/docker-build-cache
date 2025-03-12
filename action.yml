@@ -1,21 +1,32 @@
-name: Inject/Extract Cache
+name: Container Cache
 description: "Injects the cached data into the docker build(x|kit) process"
 inputs:
+  cache-image:
+    description: "The image name of the cache. Like: `dotnet:6-focal`"
+    required: true
+  cache-container:
+    description: "The container name of the cache. Like: `build-cache-xxxx`"
+    required: true
+  cache-container-cmd:
+    default: 'sleep 20m'
+    description: "The cache container startup commands. Default: `sleep 20m`"
+    required: false
   cache-source:
-    default: cache
-    description: "Where the cache is stored in the calling workspace. Default: `cache`"
+    description: "The path of the local cache. Like: `./nuget`"
+    required: true
   cache-target:
-    default: /root/.cache/go-build
-    description: "Where the cache is stored in the docker container. Default: `/root/.cache/go-build`"
-  scratch-dir:
-    default: scratch
-    description: "Where the action is stores some temporary files for its processing. Default: `scratch`"
-  skip-extraction:
-    default: "false"
-    description: "Skip the extraction of the cache from the docker container"
-  utility-image:
-    default: "busybox:1"
-    description: "The underlying image used for injection. Default: `busybox:1`"
+    description: "The path to the cache in the container. Like: `/root/.nuget/packages`"
+    required: true
+  code-source:
+    description: "The path of the local srouce code. Like: `./src/WebApplication1`"
+    required: true
+  code-target:
+    default: '/code'
+    description: "The path to the source code in the container. Default: `/code`"
+    required: false
+  restore-cmd:
+    description: "Restore package command. Like: `dotnet restore --ignore-failed-sources`"
+    required: true
 
 runs:
   using: 'node20'
