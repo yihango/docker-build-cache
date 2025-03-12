@@ -9,11 +9,13 @@ function run(cmd) {
   });
 }
 
+console.log(__dirname);
+
 const key = "POST";
 
-run("chmod +x " + __dirname + "/main");
-run("chmod +x " + __dirname + "/post");
-run("chmod +x " + __dirname + "/read-action-input");
+//run("chmod +x " + __dirname + "/main");
+//run("chmod +x " + __dirname + "/post");
+//run("chmod +x " + __dirname + "/read-action-input");
 
 if (process.env[`STATE_${key}`] !== undefined) {
   // Are we in the 'post' step?
