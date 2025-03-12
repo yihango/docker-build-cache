@@ -15,9 +15,9 @@ Create a temporary container to restore code dependencies and cache them with ac
 .github
   - workflows
   	- build.yml
- 
 src
   - vue-project
+    - Dockerfile
     - package-lock.json
     - ... other files ...
 ```
