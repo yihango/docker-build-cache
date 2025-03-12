@@ -1,0 +1,66 @@
+#!/bin/bash
+set -eux -o pipefail
+: "Argv0: $0"
+dir="$(dirname "$0")"
+read_action_input() {
+	"${dir}/read-action-input" "$1"
+}
+
+# ==== load input
+CACHE_IMAGE="$(read_action_input cache-image)"
+CACHE_CONTAINER="$(read_action_input cache-container)"
+CACHE_CONTAINER_CMD="$(read_action_input cache-container-cmd)"
+CACHE_SOURCE="$(read_action_input cache-source)"
+CACHE_TARGET="$(read_action_input cache-target)"
+CODE_SOURCE="$(read_action_input code-source)"
+CODE_TARGET="$(read_action_input code-target)"
+RESTORE_CMD="$(read_action_input restore-cmd)"
+
+# ==== docker rm -f build-cache-xx
+: "Delete if the cache-container exists"
+if docker ps -a --format '{{.Names}}' | grep -q "^${CACHE_CONTAINER}$"; then
+    echo "Container ${CACHE_CONTAINER} exists. Deleting..."
+    docker rm -f ${CACHE_CONTAINER}
+    echo "Container ${CACHE_CONTAINER} has been deleted."
+else
+    echo "Container ${CACHE_CONTAINER} does not exist."
+fi
+
+# ==== mkdir -p ./nuget
+: "Check if the cache-source exists"
+if [ ! -d "$CACHE_SOURCE" ]; then
+    echo "Directory $CACHE_SOURCE does not exist. Creating it now..."
+    mkdir -p "$CACHE_SOURCE"
+    echo "Directory $CACHE_SOURCE has been created."
+else
+    echo "Directory $CACHE_SOURCE already exists."
+fi
+
+# ==== ls -lha ./nuget
+: "Print the contents of the local cache directory after restoration"
+ls -lha $CACHE_SOURCE
+
+# ==== docker run --rm -d --name build-cache-xx dotnet:6-focal sleep 20m
+: "Run cache container"
+docker run --rm -d --name $CACHE_CONTAINER $CACHE_IMAGE $CACHE_CONTAINER_CMD
+
+# ==== docker cp ./nuget build-cache-xxx:/root/.nuget/packages
+: "Copy the local cache to the container cache"
+docker cp $CACHE_SOURCE $CACHE_CONTAINER":"$CACHE_TARGET 
+
+# ==== docker cp ./src/WebApplication1 build-cache-xxx:/code
+: "Copy the local source code to the container"
+docker cp $CODE_SOURCE $CACHE_CONTAINER":"$CODE_TARGET
+
+# ==== docker exec build-cache-xxx /bin/bash -c "cd /code && dotnet restore --ignore-failed-sources"
+: "Execution restore"
+docker exec $CACHE_CONTAINER /bin/bash -c "cd $CODE_TARGET && $RESTORE_CMD"
+
+# ==== docker cp build-cache-xxx:/root/.nuget/packages ./nuget
+: "Copy the container cache to the local cache"
+docker cp $CACHE_CONTAINER":"$CACHE_TARGET $CACHE_SOURCE
+
+# ==== ls -lha ./nuget
+: "Print the contents of the local cache directory after restoration"
+ls -lha $CACHE_SOURCE
+
