@@ -37,7 +37,7 @@ else
 fi
 
 # ==== ls -lha ./nuget
-: "Print the contents of the local cache directory after restoration"
+: "Print the contents of the local cache directory before restoration"
 ls -lha $CACHE_SOURCE
 
 # ==== docker run --rm -d --name build-cache-xx dotnet:6-focal sleep 20m
