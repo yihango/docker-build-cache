@@ -100,4 +100,4 @@ RUN echo "build is success"
 
 ## Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/rivenfx/LiteIM.svg)](https://starchart.cc/rivenfx/LiteIM)
+[![Stargazers over time](https://starchart.cc/yihango/docker-build-cache.svg)](https://starchart.cc/yihango/docker-build-cache)
